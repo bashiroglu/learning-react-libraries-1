@@ -1,42 +1,85 @@
 import React from 'react';
-import { Layout, Menu, Breadcrumb } from 'antd';
+
+import { Table, Button } from 'antd';
 import './App.css';
 
-const { Header, Content, Footer } = Layout;
+const columns = [
+  {
+    title: 'Name',
+    dataIndex: 'name'
+  },
+  {
+    title: 'Age',
+    dataIndex: 'age'
+  },
+  {
+    title: 'Address',
+    dataIndex: 'address'
+  }
+];
 
-function App() {
-  return (
-    <div className="App">
-      <Layout className="layout">
-        <Header>
-          <div className="logo" />
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            defaultSelectedKeys={['2']}
-            style={{ lineHeight: '64px' }}
+const data = [];
+for (let i = 0; i < 46; i++) {
+  data.push({
+    key: i,
+    name: `Edward King ${i}`,
+    age: 32,
+    address: `London, Park Lane no. ${i}`
+  });
+}
+
+class App extends React.Component {
+  state = {
+    selectedRowKeys: [], // Check here to configure the default column
+    loading: false
+  };
+
+  start = () => {
+    this.setState({ loading: true });
+    // ajax request after empty completing
+    setTimeout(() => {
+      this.setState({
+        selectedRowKeys: [],
+        loading: false
+      });
+    }, 1000);
+  };
+
+  onSelectChange = selectedRowKeys => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys);
+    this.setState({ selectedRowKeys });
+  };
+
+  render() {
+    const { loading, selectedRowKeys } = this.state;
+    const rowSelection = {
+      selectedRowKeys,
+      onChange: this.onSelectChange
+    };
+    const hasSelected = selectedRowKeys.length > 0;
+    return (
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Button
+            type="primary"
+            onClick={this.start}
+            disabled={!hasSelected}
+            loading={loading}
           >
-            <Menu.Item key="1">nav 1</Menu.Item>
-            <Menu.Item key="2">nav 2</Menu.Item>
-            <Menu.Item key="3">nav 3</Menu.Item>
-          </Menu>
-        </Header>
-        <Content style={{ padding: '0 50px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>List</Breadcrumb.Item>
-            <Breadcrumb.Item>App</Breadcrumb.Item>
-          </Breadcrumb>
-          <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
-            Content
-          </div>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}>
-          Ant Design ©2018 Created by Ant UED
-        </Footer>
-      </Layout>
-    </div>
-  );
+            Reload
+          </Button>
+          <span style={{ marginLeft: 8 }}>
+            {hasSelected ? `Selected ${selectedRowKeys.length} items` : ''}
+          </span>
+        </div>
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={data}
+        />
+      </div>
+    );
+  }
 }
 
 export default App;
